@@ -1,6 +1,6 @@
 /* lt__argz.c -- argz implementation for non-glibc systems
 
-   Copyright (C) 2004, 2006-2008, 2011-2019, 2021-2022 Free Software
+   Copyright (C) 2004, 2006-2008, 2011-2019, 2021-2024 Free Software
    Foundation, Inc.
    Written by Gary V. Vaughan, 2004
 
@@ -156,7 +156,7 @@ argz_insert (char **pargz, size_t *pargz_len, char *before, const char *entry)
       return ENOMEM;
 
     /* Make BEFORE point to the equivalent offset in ARGZ that it
-       used to have in *PARGZ incase realloc() moved the block.  */
+       used to have in *PARGZ in case realloc() moved the block.  */
     before = argz + offset;
 
     /* Move the ARGZ entries starting at BEFORE up into the new

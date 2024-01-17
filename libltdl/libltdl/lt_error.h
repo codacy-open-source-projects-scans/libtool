@@ -1,6 +1,6 @@
 /* lt_error.h -- error propagation interface
 
-   Copyright (C) 1999-2001, 2004, 2007, 2011-2019, 2021-2022 Free
+   Copyright (C) 1999-2001, 2004, 2007, 2011-2019, 2021-2024 Free
    Software Foundation, Inc.
    Written by Thomas Tanner, 1999
 
@@ -41,7 +41,7 @@ LT_BEGIN_C_DECLS
    this way allows us to expand the macro in different contexts with
    confidence that the enumeration of symbolic names will map correctly
    onto the table of error strings.  \0 is appended to the strings to
-   expilicitely initialize the string terminator. */
+   explicitly initialize the string terminator. */
 #define lt_dlerror_table						\
     LT_ERROR(UNKNOWN,		    "unknown error\0")			\
     LT_ERROR(DLOPEN_NOT_SUPPORTED,  "dlopen support not available\0")	\

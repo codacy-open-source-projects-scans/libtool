@@ -1,6 +1,6 @@
 # depdemo.at -- Library interdependencies		 -*- Autotest -*-
 #
-#   Copyright (C) 2003-2004, 2011-2019, 2021-2022 Free Software
+#   Copyright (C) 2003-2004, 2011-2019, 2021-2024 Free Software
 #   Foundation, Inc.
 #   Written by Gary V. Vaughan, 2003
 #
@@ -132,7 +132,7 @@ int main (int argc, char **argv)
 }
 ]])
 
-# Create 4 directorys of mostly identical files.
+# Create 4 directories of mostly identical files.
 for i in 1 2 3 4; do
   mkdir l$i
 

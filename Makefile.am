@@ -1,6 +1,6 @@
 ## Makefile.am -- Process this file with automake to produce Makefile.in
 ##
-##   Copyright (C) 2003-2019, 2021-2022 Free Software Foundation, Inc.
+##   Copyright (C) 2003-2019, 2021-2024 Free Software Foundation, Inc.
 ##   Written by Gary V. Vaughan, 2003
 ##
 ##   This file is part of GNU Libtool.
@@ -333,7 +333,7 @@ EXTRA_DIST     += $(lt_aclocal_m4) \
 		  $(lt_obsolete_m4) \
 		  $(stamp_mk)
 
-$(lt_Makefile_in): $(lt_Makefile_am) $(lt_aclocal_m4)
+$(lt_Makefile_in): $(lt_Makefile_am) $(lt_aclocal_m4) $(lt_config_h_in)
 	$(AM_V_GEN)cd '$(srcdir)/$(ltdl_dir)' && $(AUTOMAKE) Makefile
 
 # Don't let unused scripts leak into the libltdl Makefile
@@ -370,7 +370,7 @@ lt_configure_deps = $(lt_aclocal_m4) $(lt_aclocal_m4_deps)
 $(lt_aclocal_m4): $(lt_aclocal_m4_deps)
 	$(AM_V_GEN)cd '$(srcdir)/$(ltdl_dir)' && $(ACLOCAL) -I ../m4
 
-$(lt_configure): $(lt_configure_deps)
+$(lt_configure): $(lt_configure_deps) $(lt_config_h_in)
 	$(AM_V_GEN)cd '$(srcdir)/$(ltdl_dir)' && $(AUTOCONF)
 
 $(lt_config_h_in): $(lt_configure_deps)

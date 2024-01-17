@@ -1,6 +1,6 @@
 /* ltdl.c -- system independent dlopen wrapper
 
-   Copyright (C) 1998-2000, 2004-2008, 2011-2019, 2021-2022 Free
+   Copyright (C) 1998-2000, 2004-2008, 2011-2019, 2021-2024 Free
    Software Foundation, Inc.
    Written by Thomas Tanner, 1998
 
@@ -91,7 +91,6 @@ static	const char	sys_dlsearch_path[]	= LT_DLSEARCH_PATH;
 
 
 
-
 /* --- DYNAMIC MODULE LOADING --- */
 
 
@@ -1666,7 +1665,7 @@ lt_dlopenadvise (const char *filename, lt_dladvise advise)
       || !advise->try_ext
       || has_library_ext (filename))
     {
-      /* Just incase we missed a code path in try_dlopen() that reports
+      /* Just in case we missed a code path in try_dlopen() that reports
 	 an error, but forgot to reset handle... */
       if (try_dlopen (&handle, filename, NULL, advise) != 0)
 	return 0;
@@ -1970,7 +1969,7 @@ lt_dlclose (lt_dlhandle handle)
   cur->info.ref_count--;
 
   /* Note that even with resident modules, we must track the ref_count
-     correctly incase the user decides to reset the residency flag
+     correctly in case the user decides to reset the residency flag
      later (even though the API makes no provision for that at the
      moment).  */
   if (cur->info.ref_count <= 0 && !LT_DLIS_RESIDENT (cur))

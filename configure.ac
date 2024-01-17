@@ -1,6 +1,6 @@
 # Process this file with autoconf to create configure. -*- autoconf -*-
 
-#   Copyright (C) 2001, 2004-2005, 2008, 2010-2019, 2021-2022 Free
+#   Copyright (C) 2001, 2004-2005, 2008, 2010-2019, 2021-2024 Free
 #   Software Foundation, Inc.
 #   Written by Gary V. Vaughan, 2001
 #
@@ -35,7 +35,7 @@ AC_INIT([GNU Libtool],
 	m4_esyscmd([build-aux/git-version-gen .tarball-version]),
 	[bug-libtool@gnu.org])
 m4_ifndef([AC_PACKAGE_URL],
-	  [AC_SUBST([PACKAGE_URL], [http://www.gnu.org/s/libtool/])])
+	  [AC_SUBST([PACKAGE_URL], [https://www.gnu.org/s/libtool/])])
 
 # Remove this when a released Autoconf is capable of bootstrapping
 # Libtool without it (probably after autoconf-2.70).

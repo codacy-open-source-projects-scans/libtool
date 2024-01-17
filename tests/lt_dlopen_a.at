@@ -1,6 +1,6 @@
 # lt_dlopen_a.at -- test libltdl functionality                -*- Autotest -*-
 #
-#   Copyright (C) 2009, 2011-2019, 2021-2022 Free Software Foundation,
+#   Copyright (C) 2009, 2011-2019, 2021-2024 Free Software Foundation,
 #   Inc.
 #   This file is part of GNU Libtool.
 #
@@ -27,6 +27,7 @@ AT_KEYWORDS([libltdl lt_dlopen_a])
 AT_DATA([main.c],
 [[#include <ltdl.h>
 #include <stdio.h>
+#include <string.h>
 
 /* This dlopen() in the main executable should override any dlopen()s in
    shared libraries etc.

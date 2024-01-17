@@ -1,6 +1,6 @@
 # libtool.at -- basic libtool operation tests -*- Autotest -*-
 #
-#   Copyright (C) 2003-2005, 2008, 2011-2019, 2021-2022 Free Software
+#   Copyright (C) 2003-2005, 2008, 2011-2019, 2021-2024 Free Software
 #   Foundation, Inc.
 #   Written by Gary V. Vaughan, 2003
 #
@@ -128,7 +128,7 @@ for mode in compile link install; do
 
   # Shell metacharacters that should be double quoted by libtool, and need
   # backslash escaping for input to grep.
-  for mchar in "@<:@" "@:>@" "^" "*"; do
+  for mchar in "@<:@" "^" "*"; do
 
     AT_CHECK([$LIBTOOL -n --mode=$mode $preargs $preflag"$flag$mchar:test$mchar" $postargs],
 	     [0], [stdout])
@@ -137,7 +137,7 @@ for mode in compile link install; do
 
   # Metacharacters that should be double quoted by libtool, but which are
   # not special to grep (NOTE: Some of these ARE special to $EGREP!!).
-  for mchar in "~" "#" "&" "(" ")" "{" "}" "|" ";" "<" ">" "?" "'" " " "	"; do
+  for mchar in "~" "#" "&" "(" ")" "@:>@" "{" "}" "|" ";" "<" ">" "?" "'" " " "	"; do
 
     AT_CHECK([$LIBTOOL -n --mode=$mode $preargs $preflag"$flag$mchar:test$mchar" $postargs],
 	     [0], [stdout])
