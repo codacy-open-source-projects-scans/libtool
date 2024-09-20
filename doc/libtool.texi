@@ -1491,7 +1491,13 @@ Allow symbols from @var{output-file} to be resolved with @code{dlsym}
 @item -export-symbols @var{symfile}
 Tells the linker to export only the symbols listed in @var{symfile}.
 The symbol file should end in @file{.sym} and must contain the name of one
-symbol per line.  This option has no effect on some platforms.
+symbol per line.  This option has no effect:
+@itemize @bullet
+@item
+on static libraries, and
+@item
+on shared libraries on some platforms, such as AIX and Haiku.
+@end itemize
 By default all symbols are exported.
 
 @item -export-symbols-regex @var{regex}
@@ -2132,8 +2138,8 @@ LT_PREREQ([@value{VERSION}])
 @defmacx AC_PROG_LIBTOOL
 @defmacx AM_PROG_LIBTOOL
 Add support for the @option{--enable-shared}, @option{--disable-shared},
-@option{--enable-static}, @option{--disable-static}, @option{--with-pic}, and
-@option{--without-pic} @code{configure} flags.@footnote{@code{LT_INIT} requires
+@option{--enable-static}, @option{--disable-static}, @option{--enable-pic}, and
+@option{--disable-pic} @code{configure} flags.@footnote{@code{LT_INIT} requires
 that you define the @file{Makefile} variable @code{top_builddir} in your
 @file{Makefile.in}.  Automake does this automatically, but Autoconf
 users should set it to the relative path to the top of your build
@@ -2176,12 +2182,13 @@ behaves similarly, but it uses @option{--enable-static} and
 The package name @samp{default} matches any packages that have not set
 their name in the @code{PACKAGE} environment variable.
 
-The @option{--with-pic} and @option{--without-pic} configure flags can be used
-to specify whether or not @command{libtool} uses PIC objects.  By default,
+The @option{--enable-pic} and @option{--disable-pic} configure flags can be
+used to specify whether or not @command{libtool} uses PIC objects.  By default,
 @command{libtool} uses PIC objects for shared libraries and non-PIC objects for
-static libraries.  The @option{--with-pic} option also accepts a comma-separated
-list of package names.  Specifying @option{--with-pic=@var{pkgs}} is the same
-as configuring every package in @var{pkgs} with @option{--with-pic} and every
+static libraries.
+The @option{--enable-pic} option also accepts a comma-separated
+list of package names.  Specifying @option{--enable-pic=@var{pkgs}} is the same
+as configuring every package in @var{pkgs} with @option{--enable-pic} and every
 other package with the default configuration.  The package name @samp{default}
 is treated the same as for @option{--enable-shared} and
 @option{--enable-static}.
@@ -2234,7 +2241,7 @@ in link mode from the package @code{Makefile}.  Naturally, if you pass
 @item aix-soname=aix
 @itemx aix-soname=svr4
 @itemx aix-soname=both
-Enable the @option{--with-aix-soname} to @command{configure}, which the
+Enable the @option{--enable-aix-soname} to @command{configure}, which the
 user can pass to override the given default.
 
 By default (and @strong{always} in releases prior to 2.4.4), Libtool always
@@ -2248,13 +2255,13 @@ shared archives are built from shared objects, without any filename-based
 versioning; and without @option{-brtl} no shared archives are built at all.
 
 When @code{aix-soname=svr4} option is given, or the
-@option{--with-aix-soname=svr4} @command{configure} option is passed, static
+@option{--enable-aix-soname=svr4} @command{configure} option is passed, static
 archives are always created from static objects, even without @option{-brtl}
 in @code{LDFLAGS}. Shared archives are made from shared objects, and filename
 based versioning is enabled.
 
 When @code{aix-soname=both} option is given, or the
-@option{--with-aix-soname=svr4} @command{configure} option is passed, static
+@option{--enable-aix-soname=svr4} @command{configure} option is passed, static
 archives are built traditionally (as @option{aix-soname=aix}), and both
 kinds of shared archives are built. The @code{.la} pseudo-archive specifies
 one or the other depending on whether @option{-brtl} is specified in
@@ -2295,12 +2302,12 @@ specifying @option{--enable-static} to @command{configure}.
 @item pic-only
 Change the default behaviour for @command{libtool} to try to use only
 PIC objects.  The user may still override this default by specifying
-@option{--without-pic} to @command{configure}.
+@option{--disable-pic} to @command{configure}.
 
 @item no-pic
 Change the default behaviour of @command{libtool} to try to use only
 non-PIC objects.  The user may still override this default by
-specifying @option{--with-pic} to @command{configure}.
+specifying @option{--enable-pic} to @command{configure}.
 
 @end table
 
@@ -5277,9 +5284,18 @@ Tests include a demonstration of various scenarios related to using the
 are correctly linked and executed, and demonstrating flexibility in handling
 different installation paths and adapting to changing directory structures.
 
+@item @file{tests/bug_42313.at}
+Tests that there are no conflicting warnings about AC_PROG_RANLIB by verifying
+no autoscan AC_PROG_RANLIB warning and checking that AC_PROG_RANLIB declaration
+has a warning.
+
 @item @file{tests/bug_62343.at}
-Tests that the -no-canonical-prefixes flag is not removed from the linking
+Tests that the @option{-no-canonical-prefixes} flag is not removed from the linking
 command, but it is instead passed through to the linker.
+
+@item @file{tests/bug_71489.at}
+Tests that the local version of an installed program is used both with and
+without an external library.
 
 @item @file{tests/cdemo.at}
 Tests include a demonstration of @command{libtool} convenience libraries, a
@@ -5439,7 +5455,7 @@ Tests parsing of @file{.la} files including both correctly formed @file{.la}
 files and malformed or bogus @file{.la} files.
 
 @item @file{tests/libtool.at}
-Tests basic libtool functionality including shell meta-character removal, lack
+Tests basic @command{libtool} functionality including shell meta-character removal, lack
 of supplied mode option, file extension handling, simple linking,
 @option{objectlist} flag usage, and @code{LT_SUPPORTED_TAG} usage.
 
@@ -5485,7 +5501,7 @@ Tests @file{libltdl} (a @file{libdl} API for @code{dlopen}) with an extern C++
 function.
 
 @item @file{tests/ltdl-api.at}
-Tests that libtool doesn't mangle @file{gnulib} @code{argv} names.
+Tests that @command{libtool} doesn't mangle @file{gnulib} @code{argv} names.
 
 @item @file{tests/ltdl-libdir.at}
 Tests if @file{ltdl} can find an installed module using the @code{libdir}
@@ -5599,9 +5615,9 @@ update.  In each case, the tests verify that the original library will link and
 install as expected.
 
 @item @file{tests/with_pic.at}
-Tests the function of the @option{--with-pic} flag.  The @option{--with-pic}
+Tests the function of the @option{--enable-pic} flag.  The @option{--enable-pic}
 flag is used to specify whether or not @command{libtool} uses PIC objects.
-This includes tests for setting @option{--with-pic} to no, yes, or a comma
+This includes tests for setting @option{--enable-pic} to no, yes, or a comma
 delimited list of package names.
 
 @end table

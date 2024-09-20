@@ -16,10 +16,7 @@
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with GNU Libtool; see the file COPYING.  If not, a copy
-## can be downloaded from  http://www.gnu.org/licenses/gpl.html,
-## or obtained by writing to the Free Software Foundation, Inc.,
-## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+## along with GNU Libtool.  If not, see <https://www.gnu.org/licenses/>.
 #####
 
 ACLOCAL_AMFLAGS		= -I m4
@@ -569,7 +566,7 @@ ASSORT = LC_ALL=C sort
 prologue = perl -ne '/^\#\#/ and exit; print' $(no_thanks)
 
 # Generate THANKS using git log entries as far as possible, fixing
-# up ommisions and errors from NO-THANKS configuration.
+# up omissions and errors from NO-THANKS configuration.
 $(thanks): FORCE
 	$(AM_V_GEN)if test -d '$(srcdir)/.git'; then \
 	  { \
@@ -729,6 +726,7 @@ TESTSUITE_AT	= tests/testsuite.at \
 		  tests/cmdline_wrap.at \
 		  tests/bug_62343.at	\
 		  tests/bug_71489.at \
+		  tests/bug_42313.at \
 		  $(NOTHING_ELSE)
 
 EXTRA_DIST     += $(testsuite) $(TESTSUITE_AT) $(package_m4)

@@ -17,10 +17,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with GNU Libtool; see the file COPYING.  If not, a copy
-# can be downloaded from  http://www.gnu.org/licenses/gpl.html,
-# or obtained by writing to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# along with GNU Libtool.  If not, see <https://www.gnu.org/licenses/>.
 ####
 
 
@@ -166,7 +163,7 @@ LT_LANG(Windows Resource)
 AC_SUBST([to_host_file_cmd])dnl
 AC_SUBST([to_tool_file_cmd])dnl
 
-# Propagate --with-aix-soname option to the testsuite.
+# Propagate --enable-aix-soname option to the testsuite.
 AC_SUBST([with_aix_soname])dnl
 
 ## ---------------------- ##

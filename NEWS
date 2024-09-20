@@ -2,6 +2,28 @@ NEWS - list of user-visible changes between releases of GNU Libtool
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** New features:
+
+  - Add 'aarch64' support to the file magic test, which allows for
+    shared libraries to be built with Mingw for aarch64.
+
+** Bug fixes:
+
+  - The configure options --with-pic and --without-pic have been renamed
+    to --enable-pic and --disable-pic, respectively.  The old names
+    --with-pic and --without-pic are still supported, though, for
+    backward compatibility.
+
+  - The configure option --with-aix-soname has been renamed to
+    --enable-aix-soname.  The old name --with-aix-soname is still
+    supported, though, for backward compatibility.
+
+  - Fix conflicting warnings about AC_PROG_RANLIB.
+
+  - Document situations where -export-symbols does not work.
+
+  - Update FSF office address with URL in each file's license block.
+
 
 * Noteworthy changes in release 2.5.2 (2024-08-29) [beta]
 
