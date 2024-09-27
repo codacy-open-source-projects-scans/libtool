@@ -2,6 +2,9 @@ NEWS - list of user-visible changes between releases of GNU Libtool
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+
+* Noteworthy changes in release 2.5.3 (2024-09-25) [stable]
+
 ** New features:
 
   - Add 'aarch64' support to the file magic test, which allows for
@@ -23,6 +26,9 @@ NEWS - list of user-visible changes between releases of GNU Libtool
   - Document situations where -export-symbols does not work.
 
   - Update FSF office address with URL in each file's license block.
+
+  - Add checks for aclocal in standalone.at and subproject.at test files
+    that report failures in Linux From Scratch and Darwin builds.
 
 
 * Noteworthy changes in release 2.5.2 (2024-08-29) [beta]
