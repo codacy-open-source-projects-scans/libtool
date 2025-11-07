@@ -1,6 +1,6 @@
 # deplibs-mingw.at --                         -*- Autotest -*-
 
-#   Copyright (C) 2010-2019, 2021-2024 Free Software Foundation, Inc.
+#   Copyright (C) 2010-2019, 2021-2025 Free Software Foundation, Inc.
 #
 #   This file is part of GNU Libtool.
 #
@@ -23,6 +23,11 @@
 
 AT_SETUP([deplibs without file command])
 AT_KEYWORDS([libtool])
+
+# Skip failing test on MSVC
+if $LIBTOOL --config | $EGREP '^nm_interface="MS dumpbin"' >/dev/null; then
+  AT_CHECK([exit 77])
+fi
 
 cwd=`pwd`
 instdir=$cwd/inst

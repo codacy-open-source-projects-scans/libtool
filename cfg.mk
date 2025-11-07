@@ -1,6 +1,6 @@
 # cfg.mk -- Configuration for maintainer-makefile
 #
-#   Copyright (c) 2011-2019, 2021-2024 Free Software Foundation, Inc.
+#   Copyright (c) 2011-2019, 2021-2025 Free Software Foundation, Inc.
 #   Written by Gary V. Vaughan, 2011
 #
 #   This file is part of GNU Libtool.
@@ -29,7 +29,7 @@ update-release-year:
 		m4/libtool.m4
 
 # Set format of NEWS.
-old_NEWS_hash := 61ef5bb8af40dc806027f40d99f8c980
+old_NEWS_hash := 6b55a9c35959c8c4918110ff839bff7d
 
 manual_title = Portable Dynamic Shared Object Management
 
@@ -57,7 +57,8 @@ local-checks-to-skip =				\
 	sc_prohibit_always_true_header_tests	\
 	sc_prohibit_strncpy			\
 	sc_trailing_blank			\
-	sc_unmarked_diagnostics
+	sc_unmarked_diagnostics			\
+	sc_codespell
 
 # GPL_version: checks for GPLv3, which we don't use
 # cast_of_x_alloc_return_value:

@@ -1,6 +1,6 @@
 # ltdl.m4 - Configure ltdl for the target system. -*-Autoconf-*-
 #
-#   Copyright (C) 1999-2008, 2011-2019, 2021-2024 Free Software
+#   Copyright (C) 1999-2008, 2011-2019, 2021-2025 Free Software
 #   Foundation, Inc.
 #   Written by Thomas Tanner, 1999
 #
@@ -8,7 +8,7 @@
 # unlimited permission to copy and/or distribute it, with or without
 # modifications, as long as this notice is preserved.
 
-# serial 23 LTDL_INIT
+# serial 24 LTDL_INIT
 
 # LT_CONFIG_LTDL_DIR(DIRECTORY, [LTDL-MODE])
 # ------------------------------------------
@@ -435,7 +435,8 @@ esac
 
 m4_ifdef([AM_CONDITIONAL],
 [AM_CONDITIONAL(INSTALL_LTDL, test no != "${enable_ltdl_install-no}")
- AM_CONDITIONAL(CONVENIENCE_LTDL, test no != "${enable_ltdl_convenience-no}")])
+ AM_CONDITIONAL(CONVENIENCE_LTDL, test no != "${enable_ltdl_convenience-no}")
+ AM_CONDITIONAL(LTARGZH_EXISTS, test -n "$LT_ARGZ_H")])
 ])# _LT_ENABLE_INSTALL
 
 
@@ -494,7 +495,10 @@ AC_CACHE_CHECK([whether deplibs are loaded by dlopen],
     # at 6.2 and later dlopen does load deplibs.
     lt_cv_sys_dlopen_deplibs=yes
     ;;
-  netbsd*)
+  *-mlibc)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  netbsd* | netbsdelf*-gnu)
     lt_cv_sys_dlopen_deplibs=yes
     ;;
   openbsd*)

@@ -1,6 +1,6 @@
 # Process this file with autoconf to create configure. -*- autoconf -*-
 
-#   Copyright (C) 2001, 2004-2005, 2008, 2010-2019, 2021-2024 Free
+#   Copyright (C) 2001, 2004-2005, 2008, 2010-2019, 2021-2025 Free
 #   Software Foundation, Inc.
 #   Written by Gary V. Vaughan, 2001
 #
@@ -108,7 +108,7 @@ AB_INIT([$autobuild_mode])
 
 
 dnl Make sure config.status is regenerated when the version timestamp changes
-AC_SUBST([CONFIG_STATUS_DEPENDENCIES], ['$(top_srcdir)/.version'])
+AC_SUBST([CONFIG_STATUS_DEPENDENCIES], ['$(dotversion)'])
 
 
 ## ------------------------------- ##
@@ -152,6 +152,9 @@ _LTDL_SETUP
 
 # Enable all the language support we can
 LT_LANG(C++)
+LT_LANG(Objective-C)
+LT_LANG(Objective-C++)
+LT_LANG(Microsoft Macro Assembler)
 LT_LANG(Fortran 77)
 LT_LANG(Fortran)
 LT_LANG(Go)

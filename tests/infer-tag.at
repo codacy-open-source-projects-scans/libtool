@@ -1,6 +1,6 @@
 # infer-tag.at -- libtool without --tag             -*- Autotest -*-
 #
-#   Copyright (C) 2008, 2010-2019, 2021-2024 Free Software Foundation,
+#   Copyright (C) 2008, 2010-2019, 2021-2025 Free Software Foundation,
 #   Inc.
 #
 #   This file is part of GNU Libtool.
@@ -50,6 +50,74 @@ AT_CHECK([$LIBTOOL --mode=compile $CXX $CPPFLAGS $CXXFLAGS -c a.cpp],
 
 AT_CLEANUP
 
+AT_SETUP([OBJC inferred tag])
+LT_AT_TAG([OBJC])
+AT_KEYWORDS([libtool])
+
+AT_CHECK([$LIBTOOL --config | $EGREP '^objc_compiles="no"' && (exit 77)], 1)
+
+AT_DATA([a.m],
+[[
+#import <Foundation/Foundation.h>
+
+@interface Addition : NSObject
+- (int)this:(int)a that:(int)b;
+@end
+
+@implementation Addition
+- (int)this:(int)a that:(int)b
+{
+  return a + b;
+}
+@end
+
+int main() {
+    Addition *add = [[Addition alloc] init];
+    int result = [add this:10 that:20];
+    printf("add this:10 that:20 = %d", result);
+    return 0;
+}
+]])
+
+AT_CHECK([$LIBTOOL --mode=compile $OBJC $OBJCFLAGS -c a.m],
+	 [], [ignore], [ignore])
+
+AT_CLEANUP
+
+AT_SETUP([OBJCXX inferred tag])
+LT_AT_TAG([OBJCXX])
+AT_KEYWORDS([libtool])
+
+AT_CHECK([$LIBTOOL --config | $EGREP '^objc_compiles="no"' && (exit 77)], 1)
+
+AT_DATA([a.mm],
+[[
+#import <Foundation/Foundation.h>
+
+@interface Addition : NSObject
+- (int)this:(int)a that:(int)b;
+@end
+
+@implementation Addition
+- (int)this:(int)a that:(int)b
+{
+  return a + b;
+}
+@end
+
+int main() {
+    Addition *add = [[Addition alloc] init];
+    int result = [add this:10 that:20];
+    printf("add this:10 that:20 = %d", result);
+    return 0;
+}
+]])
+
+AT_CHECK([$LIBTOOL --mode=compile $OBJCXX $OBJCXXFLAGS -c a.mm -o a.o],
+	 [], [ignore], [ignore])
+
+AT_CLEANUP
+
 AT_SETUP([F77 inferred tag])
 LT_AT_TAG([F77])
 AT_KEYWORDS([libtool])
@@ -91,5 +159,41 @@ AT_DATA([A.java],
 
 AT_CHECK([$LIBTOOL --mode=compile $GCJ $GCJCFLAGS -c A.java],
 	 [], [ignore], [ignore])
+
+AT_CLEANUP
+
+AT_SETUP([ML64 inferred tag])
+LT_AT_TAG([ML64])
+AT_KEYWORDS([libtool])
+
+AT_DATA([a.asm],
+[[.code
+main PROC
+  mov eax, 5 ; Load constant value
+  inc eax ; Increment
+  ret ; Return result
+main ENDP
+end
+]])
+
+AT_CHECK([$LIBTOOL --mode=compile $ML64 $ML64FLAGS -c a.asm],
+	 [], [ignore], [ignore])
+
+AT_CLEANUP
+
+# Unsupported compiler check
+AT_SETUP([Unsupported compiler inferred tag check])
+AT_KEYWORDS([libtool])
+
+AT_DATA([a.asm],
+[[section .text
+     global _start
+  _start:
+     mov eax,1
+]])
+
+AT_XFAIL_IF([:])
+AT_CHECK([$LIBTOOL --mode=compile nasm -felf64 a.asm],
+	 [0], [ignore], [ignore])
 
 AT_CLEANUP

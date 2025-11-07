@@ -1,6 +1,6 @@
 # libtool.at -- basic libtool operation tests -*- Autotest -*-
 #
-#   Copyright (C) 2003-2005, 2008, 2011-2019, 2021-2024 Free Software
+#   Copyright (C) 2003-2005, 2008, 2011-2019, 2021-2025 Free Software
 #   Foundation, Inc.
 #   Written by Gary V. Vaughan, 2003
 #
@@ -237,5 +237,24 @@ done
 AT_CHECK([$LIBTOOL -n --mode=link --tag=UnKnOwN compiler -o liba.la foo.lo],
          [], [ignore], [stderr])
 AT_CHECK([$GREP 'ignoring unknown tag' stderr], [0], [ignore])
+
+AT_CLEANUP
+
+## -------------------- ##
+## Silence LT warnings. ##
+## -------------------- ##
+
+AT_SETUP([test silencing warnings])
+
+AT_DATA([x.cpp],
+[[
+void f(int *p) { *p = 21; }
+]])
+
+AT_CHECK([$LIBTOOL --mode=compile --tag=CXX $CXX -c x.cpp], [0], [stdout], [stderr])
+
+AT_CHECK([$LIBTOOL --no-warnings --mode=link --tag=CXX $CXX -o libx.la -no-canonical-prefixes -R /usr/lib64/ -version-info 0:0:0 x.lo], [0], [stdout], [stderr])
+
+AT_CHECK([$GREP -- 'warning' stderr], [1], [ignore])
 
 AT_CLEANUP

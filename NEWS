@@ -3,6 +3,122 @@ NEWS - list of user-visible changes between releases of GNU Libtool
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
 
+* Noteworthy changes in release 2.6.0 (2025-09-18) [alpha]
+
+** New features:
+
+  - Add a new tool, libtool-next-version, to guide users through updating
+    library versions.
+
+  - Add tagging for Objective-C and Objective-C++, OBJC and OBJCXX.
+
+  - Increase 5 digit limit on revision value for libraries to 19 digits,
+    which is referencing Unix epoch time in nanoseconds.
+
+  - Add configuration options to choose whether to use '-nostdlib' to let
+    the compiler frontend decide what standard libraries to link when
+    building C++ shared libraries and modules, --enable-cxx-stdlib and
+    --disable-cxx-stdlib.
+
+  - Allow statically linking GCC and Clang compiler support libraries
+    into shared libraries.
+
+  - Add linking clang_rt static archives compiler internal libraries by
+    their absolute path.
+
+  - Set 'mklink' as the symlinking tool for MSVC.
+
+  - Pass '--target' architecture flag for Clang.
+
+  - Support MSYS and MSYS2 file path conversions.
+
+** Bug fixes:
+
+  - Fix wrongly deduplicated compiler dependencies on linux.
+
+  - Fix NetBSD postdeps for shared libraries.
+
+  - Fix statically linking dependencies into shared C++ libraries when
+    utilizing clang builtins or g++ options like, -static-libstdc++, by
+    using a new configuration option, --enable-cxx-stdlib.
+
+  - Ensure *-linux-mlibc host matches to mlibc userland rather than
+    matching to GNU/Linux and similar userlands.
+
+  - Fix hang with cmd.exe in MSYS.
+
+  - For MSVC, fix mishandling compiler flags, symlinking, cl.exe '.exp'
+    extension collision, symbol names, and numerous testsuite bugs.
+
+  - Fix undeclared reference to access on Windows in libltdl.
+
+  - Fix flang -Wl flags on FreeBSD.
+
+  - Fix reordering '--as-needed' flag.
+
+  - Fix libltdl early failures for multi-arch.
+
+** Changes in supported systems or compilers:
+
+  - Support additional Intel OneAPI compilers, 'icx', 'icpx', and 'ifx'.
+
+  - Support ML64 (Microsoft Macro Assembler).
+
+
+* Noteworthy changes in release 2.5.4 (2024-11-20) [stable]
+
+** New features:
+
+  - New libtool command line flag, --no-finish, to skip executing
+    finish_cmds that would alter the shared library cache during testing.
+
+  - New libtool command line flag, --reorder-cache=DIRS, to reorder the
+    shared library cache, only on OpenBSD.
+
+** Bug fixes:
+
+  - Fix incorrect use of workarounds designed for Darwin versions that
+    don't have -single_module support.
+
+  - Fix errors when executing 'make distclean' and 'make maintainer-clean'.
+
+  - Fix bug where the constructed rpath omit directories, instead of
+    appending them to the end.
+
+  - Fix configure error for when variable 'multlib' is unset.
+
+  - Fix searching for -L in link paths being over-greedy and incorrectly
+    handling paths with -L in them.
+
+  - Avoid using AC_TRY_EVAL macro, "dangerous and undocumented".
+
+  - Fix linking libraries at runtime with tcc by adding run path.
+
+  - Fix path comparison by removing trailing slashes on install commands.
+
+  - Fix linking for mingw with lld by prefering response files over the
+    linker script.
+
+  - Fix '-Fe' usage with linking in MSVC.
+
+  - Fix '--no-warnings' flag.
+
+  - Fix handling xlc(1)-specific options.
+
+  - Fix Haiku support.
+
+** Changes in supported systems or compilers:
+
+  - Support additional flang-based compilers, 'f18' and 'f95'.
+
+  - Support for 'netbsdelf*-gnu'.
+
+  - Support for '*-mlibc', and subsequently Ironclad and Managarm.
+
+  - Support for SerenityOS.
+
+  - Support for wasm32-emscripten.
+
 * Noteworthy changes in release 2.5.3 (2024-09-25) [stable]
 
 ** New features:
@@ -1417,7 +1533,7 @@ New in 0.1:
 * Support for: *-*-freebsd*, *-*-netbsd*, *-*-sunos4*, *-*-ultrix4*
 -- 
 
-Copyright (C) 1996, 1998-2019, 2021-2024 Free Software Foundation, Inc.
+Copyright (C) 1996, 1998-2019, 2021-2025 Free Software Foundation, Inc.
 
 This file is part of GNU Libtool.
 

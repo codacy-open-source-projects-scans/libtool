@@ -1,6 +1,6 @@
 # destdir.at -- test various DESTDIR issues                   -*- Autotest -*-
 
-#   Copyright (C) 2006-2007, 2011-2019, 2021-2024 Free Software
+#   Copyright (C) 2006-2007, 2011-2019, 2021-2025 Free Software
 #   Foundation, Inc.
 #   Written by Ralf Wildenhues, 2006
 #
@@ -134,6 +134,47 @@ if test false != "$OBJDUMP" && ($OBJDUMP -p $bindir/m$EXEEXT) >/dev/null 2>&1; t
     AT_CHECK([$OBJDUMP -p $libdir/$lname | $EGREP -i "R(UN)?PATH.*$DESTDIR"], [1])
   fi
 fi
+
+AT_CLEANUP
+
+AT_SETUP([trailing slash in destination])
+AT_KEYWORDS([libtool])
+
+AT_DATA([configure.ac],
+[[
+AC_INIT([foo], [0])
+AM_INIT_AUTOMAKE([foreign])
+AC_PROG_CC
+LT_INIT
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_MACRO_DIRS([m4])
+AC_OUTPUT
+]])
+
+AT_DATA([Makefile.am],
+[[
+lib_LTLIBRARIES = libbase.la
+libbase_la_SOURCES = foo.c
+# Path with trailing slash for test
+bardir = /usr/lib/bar/extensions/
+bar_LTLIBRARIES = foo.la
+foo_la_SOURCES = foo.c
+foo_la_LDFLAGS = -module -avoid-version
+foo_la_LIBADD = libbase.la
+]])
+
+AT_DATA([foo.c],
+[[
+int unused;
+]])
+
+LT_AT_LIBTOOLIZE([--force --copy --install])
+LT_AT_AUTORECONF([--force --verbose --install])
+LT_AT_CONFIGURE([])
+# Use local 'tmp' directory as destination
+sysroot=`pwd`/tmp
+AT_CHECK([$MAKE], [0], [ignore], [ignore])
+AT_CHECK([$MAKE install DESTDIR=$sysroot], [0], [ignore], [ignore])
 
 AT_CLEANUP
 

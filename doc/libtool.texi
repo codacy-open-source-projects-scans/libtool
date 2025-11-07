@@ -20,7 +20,7 @@
 @copying
 This manual is for GNU Libtool (version @value{VERSION}, @value{UPDATED}).
 
-Copyright @copyright{} 1996--2019, 2021--2024 Free Software Foundation,
+Copyright @copyright{} 1996--2019, 2021--2025 Free Software Foundation,
 Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -40,6 +40,7 @@ the section entitled ``GNU Free Documentation License''.
 @direntry
 * libtool-invocation: (libtool)Invoking libtool. Running the @code{libtool} script.
 * libtoolize: (libtool)Invoking libtoolize.      Adding libtool support.
+* libtool-next-version: (libtool)Invoking libtool-next-version. Running the @code{libtool-next-version} wizard.
 @end direntry
 
 @titlepage
@@ -203,7 +204,6 @@ Porting libtool to new systems
 
 Platform quirks
 
-* References::                  Finding more information.
 * Compilers::                   Creating object files from source files.
 * Reloadable objects::          Binding object files together.
 * Multiple dependencies::       Removing duplicate dependent libraries.
@@ -936,7 +936,8 @@ lives.  So, let's try again, by invoking GDB directly on the executable:
 @example
 burger$ @kbd{gdb @value{objdir}/hell}
 GNU gdb 5.3 (i386-unknown-netbsd)
-Copyright 2002 Free Software Foundation, Inc.
+Copyright @copyright{} 1996--2019, 2021--2025 Free Software Foundation,
+Inc.
 GDB is free software, covered by the GNU General Public License,
 and you are welcome to change it and/or distribute copies of it
 under certain conditions.  Type "show copying" to see the conditions.
@@ -961,7 +962,8 @@ the executable wrapper (@pxref{Execute mode}):
 @example
 burger$ @kbd{libtool --mode=execute gdb hell}
 GNU gdb 5.3 (i386-unknown-netbsd)
-Copyright 2002 Free Software Foundation, Inc.
+Copyright @copyright{} 1996--2019, 2021--2025 Free Software Foundation,
+Inc.
 GDB is free software, covered by the GNU General Public License,
 and you are welcome to change it and/or distribute copies of it
 under certain conditions.  Type "show copying" to see the conditions.
@@ -1272,6 +1274,62 @@ stripped or the link will fail.  In cases where these duplications are
 required, this option will preserve them, only stripping the libraries
 that libtool knows it can safely.
 
+@item --no-finish
+Do not execute finish_cmds (disabled by default). This option is for
+specifying that testing of local changes to shared libraries is being
+performed so that ldconfig will not alter the shared library cache, which
+is an issue observed on OpenBSD 7.5. This option should be combined with
+the usage of @option{--mode=install} and @option{--mode=finish} to have
+any effect. Prior to utilizing this option, the shared library cache must
+not contain links to the listed install directory for shared libraries
+undergoing testing; otherwise, it will have no useful effect. In OpenBSD,
+the shared library cache can be reordered to prefer directories for
+testing shared libraries over the directories already listed in the shared
+library cache with @option{--reorder-cache=@var{shared_lib_dirs}}.
+
+@item --reorder-cache=@var{shared_lib_dirs}
+Reorder the shared library cache by providing the preferred directories
+(@var{shared_lib_dirs}) to link shared libraries from. The previous
+shared library cache is unconfigured, and the preferred directories are
+configured with the previous directories appended to the end (if not in
+the preferred directory list)@footnote{Additionally, all directories
+that no longer exist will be removed from the shared library cache.}.
+This option is currently only available on OpenBSD where @code{make
+install} has been required before @code{make check} for the shared
+library cache to be updated.
+
+This option is essentially a wrapper for executing @command{ldconfig},
+and it should be used as an independent option before and after testing
+changes to shared libraries. Below are some usage examples:
+
+@example
+$ @kbd{libtool --reorder-cache=/tmp/testing}
+Original: /usr/lib /usr/X11R6/lib /usr/local/lib
+Reordered: /tmp/testing /usr/lib /usr/X11R6/lib /usr/local/lib
+$ @kbd{libtool --reorder-cache=/usr/lib:/usr/X11R6/lib:/usr/local/lib}
+Original: /tmp/testing /usr/lib /usr/X11R6/lib /usr/local/lib
+Reordered: /usr/lib /usr/X11R6/lib /usr/local/lib /tmp/testing
+@end example
+
+@example
+$ @kbd{libtool --reorder-cache=/tmp/testing}
+Original: /usr/lib /usr/X11R6/lib /usr/local/lib
+Reordered: /tmp/testing /usr/lib /usr/X11R6/lib /usr/local/lib
+$ @kbd{rm -rf /tmp/testing}
+$ @kbd{libtool --reorder-cache=/usr/lib:/usr/X11R6/lib:/usr/local/lib}
+Original: /tmp/testing /usr/lib /usr/X11R6/lib /usr/local/lib
+Reordered: /usr/lib /usr/X11R6/lib /usr/local/lib
+@end example
+
+@example
+$ @kbd{libtool --reorder-cache=/tmp/testing:/usr/local/lib:/home/user/dir}
+Original: /usr/lib /usr/X11R6/lib /usr/local/lib
+Reordered: /tmp/testing /usr/local/lib /home/user/dir /usr/lib /usr/X11R6/lib
+$ @kbd{libtool --reorder-cache=/usr/lib /usr/X11R6/lib /usr/local/lib}
+Original: /tmp/testing /usr/local/lib /home/user/dir /usr/lib /usr/X11R6/lib
+Reordered: /usr/lib /usr/X11R6/lib /usr/local/lib /tmp/testing /home/user/dir
+@end example
+
 @item --quiet
 @itemx --silent
 Do not print out any progress or informational messages.
@@ -1279,7 +1337,7 @@ Do not print out any progress or informational messages.
 @item -v
 @itemx --verbose
 Print out progress and informational messages (enabled by default),
-as well as additional messages not ordinary seen by default.
+as well as additional messages not ordinarily seen by default.
 
 @item --no-quiet
 @itemx --no-silent
@@ -1325,6 +1383,9 @@ Print libtool version information and exit.
 Report the warnings falling in category @var{CATEGORY}. The default
 category is @command{all}. To disable warnings, use the category
 @command{none}.
+
+@item --no-warnings
+Do not print out any warning messages.
 
 @end table
 
@@ -1529,7 +1590,10 @@ if the program won't be necessarily installed.
 Link an executable @var{output-file} that can't be installed and
 therefore doesn't need a wrapper script on systems that allow hardcoding
 of library paths.  Useful if the program is only used in the build tree,
-e.g., for testing or generating other files.
+e.g., for testing or generating other files. For Windows and Darwin hosts,
+@option{-no-install} is ignored, and @option{-no-fast-install} is assumed.
+@footnote{The PATH hackery in wrapper scripts is required on Windows and
+Darwin in order for the loader to find any dlls it needs.}
 
 @item -no-undefined
 Declare that @var{output-file} does not depend on any libraries other
@@ -1643,6 +1707,11 @@ Pass a linker-specific flag directly to the linker.
 @item -XCClinker @var{flag}
 Pass a link-specific flag to the compiler driver (@code{CC}) during linking.
 @end table
+
+Note: When the output file shall depend on an installed library, you
+cannot specify the library name as @code{@var{dir}/lib@var{name}.a} or
+@code{@var{dir}/lib@var{name}.so} as part of the @var{mode-args}.
+Instead, pass the arguments @code{-L@var{dir}} and @code{-l@var{name}}.
 
 If the @var{output-file} ends in @file{.la}, then a libtool library is
 created, which must be built only from library objects (@file{.lo} files).
@@ -1991,9 +2060,11 @@ mirror, install it, and start using it.
 Learn how to write @file{Makefile} rules by hand.  They're sometimes complex,
 but if you're clever enough to write rules for compiling your old
 libraries, then you should be able to figure out new rules for libtool
-libraries (hint: examine the @file{Makefile.in} in the @file{tests/demo}
-subdirectory of the libtool distribution@dots{} note especially that it
-was automatically generated from the @file{Makefile.am} by Automake).
+libraries (hint: examine the @file{Makefile.in} in the
+@file{tests/testsuite.dir/027} subdirectory, generated from the Autotest
+labeled 'link against a preloaded static library' in @file{tests/demo.at},
+of the libtool distribution; note especially that it was automatically
+generated from the @file{Makefile.am} by Automake).
 @end enumerate
 
 @node Using Automake
@@ -2004,7 +2075,7 @@ Libtool library support is implemented under the @samp{LTLIBRARIES}
 primary.
 
 Here are some samples from the Automake @file{Makefile.am} in the
-libtool distribution's @file{demo} subdirectory.
+libtool distribution's @file{tests/demo.at}.
 
 First, to link a program against a libtool library, just use the
 @samp{program_LDADD}@footnote{@c
@@ -2267,6 +2338,9 @@ kinds of shared archives are built. The @code{.la} pseudo-archive specifies
 one or the other depending on whether @option{-brtl} is specified in
 @code{LDFLAGS} when the library is built.
 
+When using @code{LT_INIT}, the @code{shared} option must be set before the
+@code{aix-soname=(svr4|both)} option to ensure shared libraries are built.
+
 @item disable-fast-install
 Change the default behaviour for @code{LT_INIT} to disable
 optimization for fast installation.  The user may still override this
@@ -2309,6 +2383,19 @@ Change the default behaviour of @command{libtool} to try to use only
 non-PIC objects.  The user may still override this default by
 specifying @option{--enable-pic} to @command{configure}.
 
+@item cxx-stdlib
+Change the default behaviour for @command{libtool} to let the compiler
+frontend decide what standard libraries to link when building C++ shared
+libraries and modules.
+The user may still override this default by specifying
+@option{--disable-cxx-stdlib} to @command{configure}.
+
+@item no-cxx-stdlib
+Change the default behaviour for @command{libtool} to not link
+standard libraries when building C++ shared libraries and modules.
+The user may still override this default by specifying
+@option{--enable-cxx-stdlib} to @command{configure}.
+
 @end table
 
 @end defmac
@@ -2316,7 +2403,8 @@ specifying @option{--enable-pic} to @command{configure}.
 @defmac LT_LANG (@var{language})
 Enable @command{libtool} support for the language given if it
 has not yet already been enabled.  Languages accepted are ``C++'',
-``Fortran 77'', ``Java'', ``Go'', and ``Windows Resource''.
+``Objective-C'', ``Objective-C++'', ``ML64``, ``Fortran 77'', ``Java'', ``Go'',
+and ``Windows Resource''.
 
 If Autoconf language support macros such as @code{AC_PROG_CXX} are
 used in your @file{configure.ac}, Libtool language support will automatically
@@ -2932,6 +3020,8 @@ correspondence between language names and tags names.
 @item Language name    @tab Tag name
 @item C                @tab CC
 @item C++              @tab CXX
+@item Objective-C      @tab OBJC
+@item Objective-C++    @tab OBJCXX
 @item Java             @tab GCJ
 @item Fortran 77       @tab F77
 @item Fortran          @tab FC
@@ -2941,7 +3031,7 @@ correspondence between language names and tags names.
 
 @command{libtool} tries to automatically infer what tag to use from
 the compiler command being used to compile or link.  If it can't infer
-a tag, then it defaults to the configuration for the @code{C} language.
+a tag, then it exits immediately with a fatal error.
 
 The tag can also be specified using @command{libtool}'s
 @option{--tag=@var{tag}} option (@pxref{Invoking libtool}).  It is a good
@@ -3087,7 +3177,7 @@ interface number.
 Here are a set of rules to help you update your library version
 information:
 
-@enumerate 1
+@itemize @bullet
 @item
 Start with version information of @samp{0:0:0} for each libtool library.
 
@@ -3096,6 +3186,31 @@ Update the version information only immediately before a public release
 of your software.  More frequent updates are unnecessary, and only
 guarantee that the current interface number gets larger faster.
 
+@item
+Do the update either manually, or guided by the @samp{libtool-next-version}
+wizard.
+@end itemize
+
+@strong{@emph{Never}} try to set the interface numbers so that they
+correspond to the release number of your package.  This is an abuse that
+only fosters misunderstanding of the purpose of library versions.
+Instead, use the @option{-release} flag (@pxref{Release numbers}), but be
+warned that every release of your package will not be binary compatible
+with any other release.
+
+@menu
+* Manual version info update::    Updating version info manually.
+* Guided version info update::    Using the libtool-next-version program.
+* Invoking libtool-next-version:: @code{libtool-next-version} command line options.
+@end menu
+
+@node Manual version info update
+@subsection Updating the version info manually
+
+Here are the steps that you need to do, to update your library version
+information:
+
+@enumerate 1
 @item
 If the library source code has changed at all since the last update,
 then increment @var{revision} (@samp{@var{c}:@var{r}:@var{a}} becomes
@@ -3114,14 +3229,7 @@ If any interfaces have been removed or changed since the last public
 release, then set @var{age} to 0.
 @end enumerate
 
-@strong{@emph{Never}} try to set the interface numbers so that they
-correspond to the release number of your package.  This is an abuse that
-only fosters misunderstanding of the purpose of library versions.
-Instead, use the @option{-release} flag (@pxref{Release numbers}), but be
-warned that every release of your package will not be binary compatible
-with any other release.
-
-The following explanation may help to understand the above rules a bit
+The following explanation may help to understand the steps above a bit
 better: consider that there are three possible kinds of reactions from
 users of your library to changes in a shared library:
 
@@ -3151,6 +3259,79 @@ to 0.
 In the above description, @emph{programs} using the library in question
 may also be replaced by other libraries using it.
 
+@node Guided version info update
+@subsection Updating the version info, guided by the libtool-next-version program
+
+The @samp{libtool-next-version} program is a wizard-like interactive tool,
+that is designed to avoid mistakes in the process of the manual update:
+
+@itemize @bullet
+@item
+It asks you questions, one by one, so that you can focus on one thing at a time.
+@item
+It prepares default answers, based on the set of symbols exported by library.
+@item
+It gives a couple of additional explanations and hints.
+@end itemize
+
+Before invoking the wizard,
+you need to build and install the previous release and the current release
+candidate of your package into different directories.
+For example, assume the last release was @code{libfoo-1.4.tar.gz},
+and before preparing @code{libfoo-1.5.tar.gz},
+your current release candidate is @code{libfoo-1.4.99.tar.gz}.
+You build them like this:
+@example
+$ rm -rf /tmp/prev /tmp/curr
+$ tar xfz libfoo-1.4.tar.gz
+$ (cd libfoo-1.4
+   && ./configure --prefix=/tmp/prev
+   && make
+   && make install)
+$ tar xfz libfoo-1.4.99.tar.gz
+$ (cd libfoo-1.4.99
+   && ./configure --prefix=/tmp/curr
+   && make
+   && make install)
+@end example
+
+Then you are ready to invoke the wizard like this:
+@example
+$ libtool-next-version /tmp/prev/lib/libfoo.so /tmp/curr/lib/libfoo.so
+@end example
+
+@node Invoking libtool-next-version
+@subsection Invoking @command{libtool-next-version}
+@pindex libtool-next-version
+@cindex libtool-next-version command options
+@cindex command options, libtool-next-version
+@cindex options, libtool-next-version command
+
+The @code{libtool-next-version} program determines the next version to use
+for a libtool library.
+
+It is invoked as follows:
+@example
+libtool-next-version [@var{option}]... @var{previous-library} @var{current-library}
+@end example
+
+@var{previous-library} is the installed library (in @code{.a} or @code{.so}
+format) of the previous release.
+
+@var{current-library} is the installed library (in @code{.a} or @code{.so}
+format) of the current release candidate.
+
+It accepts the following options:
+
+@table @option
+
+@item --help
+Print a help message and exit.
+
+@item --version
+Print version information and exit.
+
+@end table
 
 @node Release numbers
 @section Managing release information
@@ -3298,11 +3479,31 @@ Non-ANSI compilers will report errors if functions are prototyped.
 These complications mean that your library interface headers must use
 some C preprocessor magic to be usable by each of the above compilers.
 
-@file{foo.h} in the @file{tests/demo} subdirectory of the libtool
-distribution serves as an example for how to write a header file that
+@file{foo.h}, defined in the @file{tests/demo.at} Autotest of the libtool
+distribution, serves as an example for how to write a header file that
 can be safely installed in a system directory.
 
 Here are the relevant portions of that file:
+
+@example
+#ifndef FOO_H
+#define FOO_H
+
+#ifdef __cplusplus
+extern "C" @{
+#endif
+
+int foo (void);
+int hello (void);
+
+#ifdef __cplusplus
+@}
+#endif
+
+#endif /* !FOO_H */
+@end example
+
+This can also be achieved by utilizing macros:
 
 @example
 /* BEGIN_C_DECLS should be used at the beginning of your declarations,
@@ -3331,11 +3532,11 @@ Here are the relevant portions of that file:
 #endif
 @end example
 
-These macros are used in @file{foo.h} as follows:
+These macros can be used in @file{foo.h} as follows:
 
 @example
 #ifndef FOO_H
-#define FOO_H 1
+#define FOO_H
 
 /* The above macro definitions. */
 #include "@dots{}"
@@ -3572,9 +3773,9 @@ using the @option{-dlopen} or @option{-dlpreopen} flags when you link your
 program (@pxref{Link mode}).
 
 @deftp {Data Type} {lt_dlsymlist} typedef struct @
-  @{ @w{const char *@var{name};} @w{void *@var{address};} @} lt_dlsymlist
-The @var{name} attribute is a null-terminated character string of the
-symbol name, such as @code{"fprintf"}.  The @var{address} attribute is a
+  @{ @w{const char *@code{name};} @w{void *@code{address};} @} lt_dlsymlist
+The @code{name} attribute is a null-terminated character string of the
+symbol name, such as @code{"fprintf"}.  The @code{address} attribute is
 generic pointer to the appropriate object, such as @code{&fprintf}.
 @end deftp
 
@@ -3582,10 +3783,10 @@ generic pointer to the appropriate object, such as @code{&fprintf}.
 An array of @code{lt_dlsymlist} structures, representing all the preloaded
 symbols linked into the program proper.  For each module
 @option{-dlpreopen}ed by the Libtool linked program
-there is an element with the @var{name} of the module and an @var{address}
+there is an element with the @code{name} of the module and an @code{address}
 of @code{0}, followed by all symbols exported from this file.
 For the executable itself the special name @samp{@@PROGRAM@@} is used.
-The last element of all has a @var{name} and @var{address} of
+The last element of all has a @code{name} and @code{address} of
 @code{0}.
 
 To facilitate inclusion of symbol lists into libraries,
@@ -3999,10 +4200,10 @@ portability you should try to ensure that you only pass
 @option{-module} flag.}.
 
 Unresolved symbols in the module are resolved using its dependency
-libraries and previously dlopened modules.  If the executable using
-this module was linked with the @option{-export-dynamic} flag, then the
-global symbols in the executable will also be used to resolve
-references in the module.
+libraries and, on some platforms, previously dlopened modules.  If
+the executable using this module was linked with the
+@option{-export-dynamic} flag, then the global symbols in the executable
+will also be used to resolve references in the module.
 
 If @var{filename} is @code{NULL} and the program was linked with
 @option{-export-dynamic} or @option{-dlopen self}, @code{lt_dlopen} will
@@ -4338,16 +4539,16 @@ Some of the internal information about each loaded module that is
 maintained by libltdl is available to the user, in the form of this
 structure:
 
-@deftypefn {Type} {struct} lt_dlinfo @{ @w{char *@var{filename};} @
-  @w{char *@var{name};} @w{int @var{ref_count};} @
-  @w{int @var{is_resident};} @w{int @var{is_symglobal};} @
-  @w{int @var{is_symlocal};}@}
+@deftypefn {Type} {struct} lt_dlinfo @{ @w{char *@code{filename};} @
+  @w{char *@code{name};} @w{int @code{ref_count};} @
+  @w{int @code{is_resident};} @w{int @code{is_symglobal};} @
+  @w{int @code{is_symlocal};}@}
 @code{lt_dlinfo} is used to store information about a module.
-The @var{filename} attribute is a null-terminated character string of
+The @code{filename} attribute is a null-terminated character string of
 the real module file name.  If the module is a libtool module then
-@var{name} is its module name (e.g.@: @code{"libfoo"} for
+@code{name} is its module name (e.g.@: @code{"libfoo"} for
 @code{"dir/libfoo.la"}), otherwise it is set to @code{NULL}.  The
-@var{ref_count} attribute is a reference counter that describes how
+@code{ref_count} attribute is a reference counter that describes how
 often the same module is currently loaded. The remaining fields can
 be compared to any hints that were passed to @code{lt_dlopenadvise}
 to determine whether the underlying loader was able to follow them.
@@ -4562,7 +4763,7 @@ level types.
 @code{lt_user_data} is used for specifying loader instance data.
 @end deftp
 
-@deftypefn {Type} {struct} lt_user_dlloader @{@w{const char *@var{sym_prefix};} @w{lt_module_open *@var{module_open};} @w{lt_module_close *@var{module_close};} @w{lt_find_sym *@var{find_sym};} @w{lt_dlloader_exit *@var{dlloader_exit};} @}
+@deftypefn {Type} {struct} lt_user_dlloader @{@w{const char *@code{sym_prefix};} @w{lt_module_open *@code{module_open};} @w{lt_module_close *@code{module_close};} @w{lt_find_sym *@code{find_sym};} @w{lt_dlloader_exit *@code{dlloader_exit};} @}
 If you want to define a new way to open dynamic modules, and have the
 @code{lt_dlopen} API use it, you need to instantiate one of these
 structures and pass it to @code{lt_dlloader_add}.  You can pass whatever
@@ -5427,7 +5628,8 @@ Automake.
 
 @item @file{tests/flags.at}
 Tests include checks that compile and linker flags get passed through
-@command{libtool}.  Tests flags for C, C++, Fortran 77, and Fortran 90.
+@command{libtool}.  Tests flags for C, C++, Objective-C, Objective-C++,
+ML64, Fortran 77, Fortran 90, and Java.
 
 @item @file{tests/help.at}
 Tests a variety of mode commands, including mode short-hands, to ensure basic
@@ -5440,7 +5642,8 @@ on @file{libconv}, which depends on @file{libb}, which depends on @file{liba}.
 
 @item @file{tests/infer-tag.at}
 Tests that @code{func_infer_tag} works by compiling various code snippets in
-various languages (C, C++, Fortran, Java) without a @option{--tag} flag.
+various languages (C, C++, Objective-C, Objective-C++, ML64, Fortran, Java) without
+a @option{--tag} flag.
 
 @item @file{tests/inherited_flags.at}
 Tests the functionality of the @code{inherited_linker_flags} variable in
@@ -5605,6 +5808,10 @@ Tests that @command{libtool} can handle C++ code utilizing templates.
 @item @file{tests/testsuite.at}
 Main testsuite framework file processed by @command{autom4te} processes enable
 running the @command{libtool} test cases.
+
+@item @file{tests/versioning_script.at}
+Tests @command{libtool-next-version} for verifying the helper script determines
+the next version to use for a @command{libtool} library correctly.
 
 @item @file{tests/versioning.at}
 Tests @command{libtool}'s versioning system.  Tests begin with verifying the
@@ -5848,7 +6055,6 @@ themselves, you should have a better sense of how to improve libtool, or
 write your own.
 
 @menu
-* References::                  Finding more information.
 * Compilers::                   Creating object files from source files.
 * Reloadable objects::          Binding object files together.
 * Multiple dependencies::       Removing duplicate dependent libraries.
@@ -5857,36 +6063,6 @@ write your own.
 * File name conversion::        Converting file names between platforms.
 * Windows DLLs::                Windows header defines.
 @end menu
-
-@node References
-@subsection References
-
-The following is a list of valuable documentation references:
-
-@itemize @bullet
-@item
-SGI's IRIX Manual Pages can be found at@*
-@url{http://techpubs.sgi.com/cgi-bin/infosrch.cgi?cmd=browse&db=man}.
-
-@item
-Sun's free service area
-(@url{http://www.sun.com/service/online/free.html}) and documentation
-server (@url{http://docs.sun.com/}).
-
-@item
-Compaq's Tru64 UNIX online documentation is at@*
-(@url{http://tru64unix.compaq.com/faqs/publications/pub_page/doc_list.html})
-with C++ documentation at@*
-(@url{http://tru64unix.compaq.com/cplus/docs/index.htm}).
-
-@item
-Hewlett-Packard has online documentation at
-(@url{http://docs.hp.com/index.html}).
-
-@item
-IBM has online documentation at
-(@url{http://www.rs6000.ibm.com/resource/aix_resource/Pubs/}).
-@end itemize
 
 @node Compilers
 @subsection Compilers
@@ -6833,7 +7009,8 @@ shell does not support the shell option @code{nocaseglob}, making
 
 @defvar finish_cmds
 Commands to tell the dynamic linker how to find shared libraries in a
-specific directory.
+specific directory. These commands can be disabled during testing local
+changes to shared libraries with @option{--no-finish}.
 @end defvar
 
 @defvar finish_eval
@@ -7190,7 +7367,8 @@ trick$ chmod +x libtool
 trick$ libtool --version
 ltmain.sh (GNU @@PACKAGE@@@@TIMESTAMP@@) @@VERSION@@
 
-Copyright (C) 2014 Free Software Foundation, Inc.
+Copyright @copyright{} 1996--2019, 2021--2025 Free Software Foundation,
+Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 trick$
