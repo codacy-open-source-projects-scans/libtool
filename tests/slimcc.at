@@ -1,8 +1,6 @@
-# link-order.at -- ensure that library linking order matches  -*- Autotest -*-
+# slimcc.at - Link order check for the slimcc compiler   -*- Autotest -*-
 #
-#   Copyright (C) 2005, 2007-2008, 2011-2019, 2021-2026 Free Software
-#   Foundation, Inc.
-#   Written by Alexandre Oliva & Ralf Wildenhues, 2005
+#   Copyright (C) 2025-2026 Free Software Foundation, Inc.
 #
 #   This file is part of GNU Libtool.
 #
@@ -21,13 +19,15 @@
 ####
 
 
-AT_SETUP([Link order test])
-AT_KEYWORDS([libtool])
+AT_SETUP([Link order slimcc test])
+AT_KEYWORDS([slimcc])
 eval `$LIBTOOL --config | $EGREP '^(hardcode_direct|hardcode_direct_absolute|shrext_cmds)='`
 LDFLAGS="$LDFLAGS -no-undefined"
 
 module=no
 eval shared_ext=\"$shrext_cmds\"
+
+AT_CHECK([$LIBTOOL --config | $EGREP '^CC=slimcc' || exit 77], 1)
 
 prefix_old=`pwd`/old
 prefix_new=`pwd`/new
@@ -46,31 +46,13 @@ for i in old new; do
   mkdir src
 
   cat >src/a_$i.c <<EOF
-/* w32 fun, MSVC needs to dllimport when using a shared library, so use
- * DLL_EXPORT to discriminate as that happens to coincide in this case.
- * gnu has auto import.
- */
-#if defined _MSC_VER && defined DLL_EXPORT
-#  define LIBCEE_SCOPE __declspec(dllimport)
-#else
-#  define LIBCEE_SCOPE extern
-#endif
-LIBCEE_SCOPE int c;
+extern int c;
 extern int b_$i();
 int a_$i() { return c + b_$i(); }
 EOF
 
   cat >src/b_$i.c <<EOF
-/* w32 fun, MSVC needs to dllimport when using a shared library, so use
- * DLL_EXPORT to discriminate as that happens to coincide in this case.
- * gnu has auto import.
- */
-#if defined _MSC_VER && defined DLL_EXPORT
-#  define LIBCEE_SCOPE __declspec(dllimport)
-#else
-#  define LIBCEE_SCOPE extern
-#endif
-LIBCEE_SCOPE int c;
+extern int c;
 int b_$i() { return 1 + c; }
 EOF
 
@@ -89,22 +71,17 @@ done
 $LIBTOOL --mode=clean rm -f src/libb.la
 $LIBTOOL --mode=clean rm -f src/liba.la
 
-case $host_os in
-aix* | interix*) ;;  # These systems have different path syntax
+# Do not error if we do not relink (e.g. static-only systems)
+case $hardcode_direct$hardcode_direct_absolute in
+yesno)
+  AT_CHECK([if $EGREP relinking stderr; then
+       $EGREP " .*/new/lib/libb$shared_ext .*/old/lib/libcee$shared_ext" stdout
+     else :; fi], [0], [ignore], [], [echo "wrong link order"])
+  ;;
 *)
-  # Do not error if we do not relink (e.g. static-only systems)
-  case $hardcode_direct$hardcode_direct_absolute in
-  yesno)
-    AT_CHECK([if $EGREP relinking stderr; then
-         $EGREP " .*/new/lib/libb$shared_ext .*/old/lib/libcee$shared_ext" stdout
-       else :; fi], [0], [ignore], [], [echo "wrong link order"])
-    ;;
-  *)
-    AT_CHECK([if $EGREP relinking stderr; then
-         $EGREP " -L.*/new/lib -lb -L.*/old/lib -lcee" stdout
-       else :; fi], [0], [ignore], [], [echo "wrong link order"])
-    ;;
-  esac
+  AT_CHECK([if $EGREP relinking stderr; then
+       $EGREP " -L.*/new/lib -lb -L.*/old/lib -lcee" stdout
+     else :; fi], [0], [ignore], [], [echo "wrong link order"])
   ;;
 esac
 

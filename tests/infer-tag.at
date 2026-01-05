@@ -1,6 +1,6 @@
 # infer-tag.at -- libtool without --tag             -*- Autotest -*-
 #
-#   Copyright (C) 2008, 2010-2019, 2021-2025 Free Software Foundation,
+#   Copyright (C) 2008, 2010-2019, 2021-2026 Free Software Foundation,
 #   Inc.
 #
 #   This file is part of GNU Libtool.
@@ -88,7 +88,7 @@ AT_SETUP([OBJCXX inferred tag])
 LT_AT_TAG([OBJCXX])
 AT_KEYWORDS([libtool])
 
-AT_CHECK([$LIBTOOL --config | $EGREP '^objc_compiles="no"' && (exit 77)], 1)
+AT_CHECK([$LIBTOOL --config | $EGREP '^objcxx_compiles="no"' && (exit 77)], 1)
 
 AT_DATA([a.mm],
 [[

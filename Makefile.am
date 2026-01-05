@@ -1,6 +1,6 @@
 ## Makefile.am -- Process this file with automake to produce Makefile.in
 ##
-##   Copyright (C) 2003-2019, 2021-2025 Free Software Foundation, Inc.
+##   Copyright (C) 2003-2019, 2021-2026 Free Software Foundation, Inc.
 ##   Written by Gary V. Vaughan, 2003
 ##
 ##   This file is part of GNU Libtool.
@@ -679,6 +679,7 @@ TESTSUITE_AT	= tests/testsuite.at \
 		  tests/inherited_flags.at \
 		  tests/link-order.at \
 		  tests/link-order2.at \
+		  tests/slimcc.at \
 		  tests/fail.at \
 		  tests/shlibpath.at \
 		  tests/runpath-in-lalib.at \

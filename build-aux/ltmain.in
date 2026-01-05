@@ -4,7 +4,7 @@
 # Provide generalized library-building support services.
 # Written by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 
-# Copyright (C) 1996-2019, 2021-2025 Free Software Foundation, Inc.
+# Copyright (C) 1996-2019, 2021-2026 Free Software Foundation, Inc.
 # This is free software; see the source for copying conditions.  There is NO
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -3505,7 +3505,7 @@ func_extract_archives ()
 	    $RM -rf unfat-$$
 	    cd "$darwin_orig_dir"
 	  else
-	    cd $darwin_orig_dir
+	    cd "$darwin_orig_dir"
 	    func_extract_an_archive "$my_xdir" "$my_xabs"
 	  fi # $darwin_arches
 	} # !$opt_dry_run
