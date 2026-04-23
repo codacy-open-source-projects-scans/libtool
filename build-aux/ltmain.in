@@ -4838,7 +4838,15 @@ func_mode_link ()
       # even a static library is built.  For now, we need to specify
       # -no-undefined on the libtool link line when we can be certain
       # that all symbols are satisfied, otherwise we get a static library.
-      allow_undefined=yes
+      case $host in
+      *-*-os2*)
+        # OS/2 does not allow undefined symbols at all when linking a dll.
+        allow_undefined=no
+        ;;
+      *)
+        allow_undefined=yes
+        ;;
+      esac
       ;;
     *)
       allow_undefined=yes
@@ -4910,7 +4918,7 @@ func_mode_link ()
 	build_old_libs=no
 	break
 	;;
-      -all-static | -static | -static-libtool-libs)
+      -all-static | -static | -static-libtool-libs | --static | -Bstatic)
 	case $arg in
 	-all-static)
 	  if test yes = "$build_libtool_libs" && test -z "$link_static_flag"; then
@@ -4927,7 +4935,7 @@ func_mode_link ()
 	  fi
 	  prefer_static_libs=built
 	  ;;
-	-static-libtool-libs)
+	-static-libtool-libs | --static | -Bstatic)
 	  if test -z "$pic_flag" && test -n "$link_static_flag"; then
 	    dlopen_self=$dlopen_self_static
 	  fi
@@ -4943,6 +4951,16 @@ func_mode_link ()
 
     # See if our shared archives depend on static archives.
     test -n "$old_archive_from_new_cmds" && build_old_libs=yes
+
+    # make sure "-Xpreprocessor -fopenmp" is processed as one token
+    case $@ in
+    *-Xpreprocessor\ -fopenmp*)
+      fopenmp_match="-Xpreprocessor -fopenmp"
+      ;;
+    *)
+      fopenmp_match=-fopenmp
+      ;;
+    esac
 
     # Go through the arguments, transforming them on the way.
     while test "$#" -gt 0; do
@@ -5433,7 +5451,7 @@ func_mode_link ()
 	continue
 	;;
       -mt|-mthreads|-kthread|-Kthread|-pthreads|--thread-safe \
-      |-threads|-fopenmp|-fopenmp=*|-openmp|-mp|-xopenmp|-omp|-qsmp=*)
+      |-threads|$fopenmp_match|fopenmp=*|-openmp|-mp|-xopenmp|-omp|-qsmp=*)
 	func_append compiler_flags " $arg"
 	func_append compile_command " $arg"
 	func_append finalize_command " $arg"
@@ -5660,6 +5678,7 @@ func_mode_link ()
       # -fuse-ld=*           Linker select flags for GCC
       # -static-*            direct GCC to link specific libraries statically
       # -fcilkplus           Cilk Plus language extension features for C/C++
+      # -resource-dir=*      for selecting compiler resource directory with clang
       # -rtlib=*             select c runtime lib with clang
       # --unwindlib=*        select unwinder library with clang
       # -f{file|debug|macro|profile}-prefix-map=* needed for lto linking
@@ -5668,7 +5687,7 @@ func_mode_link ()
       -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
       -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*|--target=*| \
       -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-no-canonical-prefixes| \
-      -stdlib=*|-rtlib=*|--unwindlib=*| \
+      -stdlib=*|-resource-dir=*|-rtlib=*|--unwindlib=*| \
       -specs=*|-fsanitize=*|-fno-sanitize*|-shared-libsan|-static-libsan| \
       -ffile-prefix-map=*|-fdebug-prefix-map=*|-fmacro-prefix-map=*|-fprofile-prefix-map=*| \
       -fdiagnostics-color*|-frecord-gcc-switches| \
@@ -5794,8 +5813,8 @@ func_mode_link ()
 	fi
 	;;
 
-      *.$libext)
-	# An archive.
+      *.$libext|*.so)
+	# An archive or an explicit shared library.
 	func_append deplibs " $arg"
 	func_append old_deplibs " $arg"
 	continue
@@ -6023,7 +6042,7 @@ func_mode_link ()
        continue
        ;;
 	-mt|-mthreads|-kthread|-Kthread|-pthread|-pthreads|--thread-safe \
-        |-threads|-fopenmp|-fopenmp=*|-openmp|-mp|-xopenmp|-omp|-qsmp=*)
+        |-threads|$fopenmp_match|fopenmp=*|-openmp|-mp|-xopenmp|-omp|-qsmp=*)
 	  if test prog,link = "$linkmode,$pass"; then
 	    compile_deplibs="$deplib $compile_deplibs"
 	    finalize_deplibs="$deplib $finalize_deplibs"
@@ -6173,6 +6192,25 @@ func_mode_link ()
 	  func_resolve_sysroot "$deplib"
 	  lib=$func_resolve_sysroot_result
 	  ;;
+	 *.so)
+	   case $linkmode,$pass in
+	     lib,*)
+	       deplibs="$deplib $deplibs"
+	       newdependency_libs="$deplib $newdependency_libs"
+	       ;;
+	     prog,link)
+	       compile_deplibs="$deplib $compile_deplibs"
+	       finalize_deplibs="$deplib $finalize_deplibs"
+	       ;;
+	     prog,*)
+	       deplibs="$deplib $deplibs"
+	       ;;
+	     *)
+	       func_warning "'$deplib' is ignored for archives/objects"
+	       ;;
+	   esac
+	   continue
+	   ;;
 	*.$libext)
 	  if test conv = "$pass"; then
 	    deplibs="$deplib $deplibs"

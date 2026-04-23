@@ -2,6 +2,16 @@ NEWS - list of user-visible changes between releases of GNU Libtool
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** New features:
+
+  - Pass 'resource-dir=*' flag for Clang.
+
+  - Recognise explicit shared library arguments when linking dependency
+    libraries to a shared library, like exists when linking a program.
+
+  - Support OpenMP with macOS clang by processing '-Xpreprocessor
+    -fopenmp' as one token.
+
 ** Bug fixes:
 
   - Store cygpath file path conversions correctly for MSYS2 and MSVC.
@@ -17,6 +27,10 @@ NEWS - list of user-visible changes between releases of GNU Libtool
 
   - Remove unused variable on OS/2, which could cause issues with static
     library generation if defined.
+
+  - Recognise more static linking options for Clang.
+
+  - Fix emscripten CXX postdeps using non-PIC sysroot.
 
 ** Changes in supported systems or compilers:
 
