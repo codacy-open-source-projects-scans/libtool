@@ -4,6 +4,24 @@ NEWS - list of user-visible changes between releases of GNU Libtool
 
 ** New features:
 
+  - Pass through -fno-lto and -ffixed=* to disable link-time optimization
+    and reserve registers.
+
+** Changes in supported systems or compilers:
+
+  - Support AOCC Fortran compiler 'aof'.
+
+
+* Noteworthy changes in release 2.6.2 (2026-07-16) [stable]
+
+  Please see beta release 2.6.1 and alpha release 2.6.0 for a list of
+  release changes.
+
+
+* Noteworthy changes in release 2.6.1 (2026-06-04) [beta]
+
+** New features:
+
   - Pass 'resource-dir=*' flag for Clang.
 
   - Recognise explicit shared library arguments when linking dependency
@@ -32,9 +50,17 @@ NEWS - list of user-visible changes between releases of GNU Libtool
 
   - Fix emscripten CXX postdeps using non-PIC sysroot.
 
+  - Avoid deprecated option '-o' with MSVC compilers and replace with '-Fe'.
+
+  - Avoid overlinking of dependency libraries on ELF systems.
+
+  - Ensure old libraries are not archived.
+
 ** Changes in supported systems or compilers:
 
   - Add support for SlimCC compiler.
+
+  - Add support for *-ironclad-gnu.
 
 
 * Noteworthy changes in release 2.6.0 (2025-09-18) [alpha]
